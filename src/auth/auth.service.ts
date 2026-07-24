@@ -3,7 +3,6 @@ import {
   ConflictException,
   UnauthorizedException,
   BadRequestException,
-  NotFoundException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
@@ -51,6 +50,41 @@ export class AuthService {
     return {
       message:
         'Registeration Successful. Please check you email to verify your account.',
+    };
+  }
+
+  async verifyEmail(token: string, res: Response) {
+    const user = await this.usersService.findByVerificationToken(token);
+    if (!user || !user.verificationToken) {
+      throw new BadRequestException('Invalid verification token');
+    }
+
+    if (
+      user.verificationTokenExpiresAt &&
+      user.verificationTokenExpiresAt < new Date()
+    ) {
+      throw new BadRequestException('Verification Token has Expired');
+    }
+
+    await this.usersService.update(user.id, {
+      isVerified: true,
+      verificationToken: null,
+      verificationTokenExpiresAt: null,
+    });
+
+    const tokens = await this.generateTokens(user);
+    await this.saveRefreshToken(user.id, tokens.refreshToken);
+    this.setRefreshTokenCookie(res, tokens.refreshToken);
+
+    return {
+      message: 'Email verified successfully. You are logged in',
+      accessToken: tokens.accessToken,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+      },
     };
   }
 
