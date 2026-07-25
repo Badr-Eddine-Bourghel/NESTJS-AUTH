@@ -5,7 +5,7 @@ import { eq } from 'drizzle-orm';
 import type { NewUser } from 'src/db/schema';
 
 @Injectable()
-export class UsersServce {
+export class UsersService {
   async findByVerificationToken(token: string) {
     return db.query.users.findFirst({
       where: eq(users.verificationToken, token),
