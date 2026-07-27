@@ -1,4 +1,8 @@
 import { Module } from '@nestjs/common';
+
+// ConfigModule is a nestjs built in way to load my '.env' in the memory when the application starts
+// and inject '.env' variables anywhere in my app using ConfigService, so I can use this line of code
+// this.configService.get('JWT_ACCESS_SECRET') to get my JWT_ACCESS_SECRET
 import { ConfigModule } from '@nestjs/config';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
@@ -8,9 +12,10 @@ import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
+    // Global setup for ConfigModule
     ConfigModule.forRoot({
-      isGlobal: true,
-      expandVariables: true,
+      isGlobal: true, // Makes ConfigService available everywhere without re-importing
+      expandVariables: true, // The option give us the possibility to use ${any .env variable} and it wont be treated as string
     }),
     JwtModule.register({ global: true }),
     UsersModule,

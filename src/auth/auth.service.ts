@@ -220,11 +220,11 @@ export class AuthService {
     const payload = { sub: user.id, email: user.email, role: user.role };
     const accessToken = await this.jwtService.signAsync(payload, {
       secret: this.configService.get('JWT_ACCESS_SECRET'),
-      expiresIn: this.configService.get('JWT_ACESSS_EXPIRES_IN'),
+      expiresIn: this.configService.get('JWT_ACCESSS_EXPIRES_IN'),
     });
     const refreshToken = await this.jwtService.signAsync(payload, {
       secret: this.configService.get('JWT_REFRESH_SECRET'),
-      expiresIn: this.configService.get('JWT_REFRESH_EXPIRES_In'),
+      expiresIn: this.configService.get('JWT_REFRESH_EXPIRES_IN'),
     });
     return {
       accessToken,

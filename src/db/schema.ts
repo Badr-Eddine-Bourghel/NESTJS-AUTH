@@ -1,3 +1,4 @@
+// Will Use drizzle-orm to generate out db schema , and because we want to create our db using postgresql we will use pg-core.
 import {
   pgTable,
   text,
@@ -16,7 +17,7 @@ export const users = pgTable('users', {
   name: text('name').notNull(),
   role: userRoleEnum('role').notNull().default('user'),
   isVerified: boolean('is_verified').notNull().default(false),
-  verificationToken: text('verificaion_token'),
+  verificationToken: text('verification_token'),
   verificationTokenExpiresAt: timestamp('verification_token_expires_at'),
   resetToken: text('reset_token'),
   resetTokenExpiresAt: timestamp('reset_token_expires_at'),
@@ -43,7 +44,12 @@ export const tasks = pgTable('tasks', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
+// Create a TypeScript type definition (by using type) and make them available to be imported (by using export)
+
+// By using '$inferSeclect' we create variable that represents a row inside my database we can use them when quering the database
 export type User = typeof users.$inferSelect;
-export type NewUser = typeof users.$inferInsert;
 export type Task = typeof tasks.$inferSelect;
+
+// By using '$inferInsert' we create variable that represents data we need to insert in the database we can use them when creating new row in the database
+export type NewUser = typeof users.$inferInsert;
 export type NewTask = typeof tasks.$inferInsert;
