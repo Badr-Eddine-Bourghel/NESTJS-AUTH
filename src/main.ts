@@ -26,11 +26,12 @@ async function bootstrap() {
   // Set up strict, global request validation on encomine JSON data
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true,
-      forbidNonWhitelisted: true,
-      transform: true,
+      whitelist: true, // Automatically strips away/ignores extra, unexpected properties sent in request bodies.
+      forbidNonWhitelisted: true, // Throws an error immediately if a user attempts to send unrecognized fields in a request.
+      transform: true, // Automatically converts incoming payloads into their target DTO instances (and converts data types, like strings to numbers)
     }),
   );
+
   app.useGlobalFilters(new HttpExceptionFilter());
   const config = new DocumentBuilder()
     .setTitle('NestJs Auth api')
