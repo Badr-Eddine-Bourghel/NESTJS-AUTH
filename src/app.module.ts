@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 // ConfigModule is a nestjs built in way to load my '.env' in the memory when the application starts
 // and inject '.env' variables anywhere in my app using ConfigService, so I can use this line of code
 // this.configService.get('JWT_ACCESS_SECRET') to get my JWT_ACCESS_SECRET
@@ -15,6 +15,12 @@ import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
+    ThrottlerModule.forRoot([
+      {
+        ttl: 6000,
+        limit: 20,
+      },
+    ]),
     // Global setup for ConfigModule
     ConfigModule.forRoot({
       isGlobal: true, // Makes ConfigService available everywhere without re-importing
@@ -27,6 +33,7 @@ import { AdminModule } from './admin/admin.module';
     AdminModule,
   ],
   providers: [
+    { provide: APP_GUARD, useClass: ThrottlerGuard },
     { provide: APP_GUARD, useClass: JwtAuthGuard },
     { provide: APP_GUARD, useClass: RolesGuard },
   ],

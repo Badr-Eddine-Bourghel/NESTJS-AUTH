@@ -24,6 +24,7 @@ import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import type { User } from 'src/db/schema';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { Throttle } from '@nestjs/throttler';
 
 @ApiTags('Auth')
 @Controller('Auth')
@@ -50,6 +51,7 @@ export class AuthController {
   }
 
   // Post /api/auth/login
+  @Throttle({ default: { ttl: 6000, limit: 5 } })
   @Public()
   @Post('login')
   @HttpCode(HttpStatus.OK)
@@ -103,6 +105,7 @@ export class AuthController {
   }
 
   // Post /api/auth/forgot-password
+  @Throttle({ default: { ttl: 6000, limit: 3 } })
   @Public()
   @Post('forgot-password')
   @HttpCode(HttpStatus.OK)
