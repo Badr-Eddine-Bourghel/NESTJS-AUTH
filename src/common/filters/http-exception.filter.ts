@@ -30,19 +30,22 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
     const status =
       exception instanceof HttpException // Check if known HTTP error
-        ? exception.getStatus() // if yes we use the status code
+        ? exception.getStatus() // if yes we use the status code (400,401,500...)
         : HttpStatus.INTERNAL_SERVER_ERROR; // if not we use '500 internel Server Error'
 
     const exceptionResponse =
-      exception instanceof HttpException
-        ? exception.getResponse()
-        : 'Internal Server Error';
+      exception instanceof HttpException // if the error was intentionally thrown using Nestjs's built-in HttpException class (like BadRequestException, Unauth...)
+        ? exception.getResponse() // if it is in an HTTPException we extract the error details that nestjs saved inside it
+        : 'Internal Server Error'; // if no we send an 'Internal Server Error ' message
 
+    // safety check for the exceptionResponse
     const message =
-      typeof exceptionResponse === 'string'
-        ? exceptionResponse
+      typeof exceptionResponse === 'string' // if the exceptionResponse is a string like ('User not found')
+        ? exceptionResponse // if yes we return the exceptionResponse
         : ((exceptionResponse as Record<string, unknown>).message ??
-          exceptionResponse);
+          exceptionResponse); // if not (it's an object) we return the .message property form the object and if it's null or undefined we return all object as a backup
+
+    // Turning the messy errors into a clean format
     response.status(status).json({
       statusCode: status,
       message,
